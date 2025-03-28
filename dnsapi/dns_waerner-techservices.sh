@@ -13,7 +13,7 @@ WTS_API="https://wts-api.de/hosting/domain"
 
 ########  Public functions ######################
 
-#Usage: dns_wts_add _acme-challenge.domain.ipv64.net "XKrxpRBosdIKFzxW_CT3KLZNf6q0HG9i01zxXp5CPBs"
+#Usage: dns_wts_add _acme-challenge.domain "XKrxpRBosdIKFzxW_CT3KLZNf6q0HG9i01zxXp5CPBs"
 dns_wts_add() {
   fulldomain=$1
   txtvalue=$2
@@ -41,7 +41,7 @@ dns_wts_add() {
   _sub_domain="$(echo "$_sub_domain" | _lower_case)"
   # Now add the TXT record
   _info "Trying to add TXT record"
-  if _ipv64_rest "POST" "add_record=$_domain&praefix=$_sub_domain&type=TXT&content=$txtvalue"; then
+  if _wts_rest "POST" "add_record=$_domain&praefix=$_sub_domain&type=TXT&content=$txtvalue"; then
     _info "TXT record has been successfully added."
     return 0
   else
@@ -52,7 +52,7 @@ dns_wts_add() {
 }
 
 #Usage: fulldomain txtvalue
-#Usage: dns_wts_rm _acme-challenge.domain.ipv64.net "XKrxpRBosdIKFzxW_CT3KLZNf6q0HG9i01zxXp5CPBs"
+#Usage: dns_wts_rm _acme-challenge.domain "XKrxpRBosdIKFzxW_CT3KLZNf6q0HG9i01zxXp5CPBs"
 #Remove the txt record after validation.
 dns_wts_rm() {
   fulldomain=$1
@@ -78,7 +78,7 @@ dns_wts_rm() {
   _sub_domain="$(echo "$_sub_domain" | _lower_case)"
   # Now delete the TXT record
   _info "Trying to delete TXT record"
-  if _ipv64_rest "DELETE" "del_record=$_domain&praefix=$_sub_domain&type=TXT&content=$txtvalue"; then
+  if _wts_rest "DELETE" "del_record=$_domain&praefix=$_sub_domain&type=TXT&content=$txtvalue"; then
     _info "TXT record has been successfully deleted."
     return 0
   else
@@ -98,7 +98,7 @@ _get_root() {
   i=1
   p=1
 
-  _ipv64_get "get_domains"
+  _wts_get "get_domains"
   domain_data=$_response
 
   while true; do
@@ -122,7 +122,7 @@ _get_root() {
 
 #send get request to api
 # $1 has to set the api-function
-_ipv64_get() {
+_wts_get() {
   url="$WTS_API?$1"
   export _H1="Authorization: Bearer $WTS_Token"
 
@@ -137,7 +137,7 @@ _ipv64_get() {
   fi
 }
 
-_ipv64_rest() {
+_wts_rest() {
   url="$WTS_API"
   export _H1="Authorization: Bearer $WTS_Token"
   export _H2="Content-Type: application/x-www-form-urlencoded"
