@@ -1,33 +1,33 @@
 #!/usr/bin/env sh
 # shellcheck disable=SC2034
-dns_ipv64_info='Waerner-TechServices.de
+dns_wts_info='Waerner-TechServices.de
 Site: Waerner-TechServices.de
-Docs: github.com/acmesh-official/acme.sh/wiki/dnsapi2#dns_ipv64
+Docs: github.com/acmesh-official/acme.sh/wiki/dnsapi2#dns_wts
 Options:
  WTS_Token API Token
 Issues: github.com/acmesh-official/acme.sh/issues/4419
 Author: Lukas Wärner
 '
 
-IPv64_API="https://wts-api.de/hosting/domain"
+WTS_API="https://wts-api.de/hosting/domain"
 
 ########  Public functions ######################
 
-#Usage: dns_ipv64_add _acme-challenge.domain.ipv64.net "XKrxpRBosdIKFzxW_CT3KLZNf6q0HG9i01zxXp5CPBs"
-dns_ipv64_add() {
+#Usage: dns_wts_add _acme-challenge.domain.ipv64.net "XKrxpRBosdIKFzxW_CT3KLZNf6q0HG9i01zxXp5CPBs"
+dns_wts_add() {
   fulldomain=$1
   txtvalue=$2
 
-  IPv64_Token="${IPv64_Token:-$(_readaccountconf_mutable IPv64_Token)}"
-  if [ -z "$IPv64_Token" ]; then
-    _err "You must export variable: IPv64_Token"
+  WTS_Token="${WTS_Token:-$(_readaccountconf_mutable WTS_Token)}"
+  if [ -z "$WTS_Token" ]; then
+    _err "You must export variable: WTS_Token"
     _err "The API Key for your IPv64 account is necessary."
     _err "You can look it up in your IPv64 account."
     return 1
   fi
 
   # Now save the credentials.
-  _saveaccountconf_mutable IPv64_Token "$IPv64_Token"
+  _saveaccountconf_mutable WTS_Token "$WTS_Token"
 
   if ! _get_root "$fulldomain"; then
     _err "invalid domain" "$fulldomain"
@@ -52,15 +52,15 @@ dns_ipv64_add() {
 }
 
 #Usage: fulldomain txtvalue
-#Usage: dns_ipv64_rm _acme-challenge.domain.ipv64.net "XKrxpRBosdIKFzxW_CT3KLZNf6q0HG9i01zxXp5CPBs"
+#Usage: dns_wts_rm _acme-challenge.domain.ipv64.net "XKrxpRBosdIKFzxW_CT3KLZNf6q0HG9i01zxXp5CPBs"
 #Remove the txt record after validation.
-dns_ipv64_rm() {
+dns_wts_rm() {
   fulldomain=$1
   txtvalue=$2
 
-  IPv64_Token="${IPv64_Token:-$(_readaccountconf_mutable IPv64_Token)}"
-  if [ -z "$IPv64_Token" ]; then
-    _err "You must export variable: IPv64_Token"
+  WTS_Token="${WTS_Token:-$(_readaccountconf_mutable WTS_Token)}"
+  if [ -z "$WTS_Token" ]; then
+    _err "You must export variable: WTS_Token"
     _err "The API Key for your IPv64 account is necessary."
     _err "You can look it up in your IPv64 account."
     return 1
@@ -123,8 +123,8 @@ _get_root() {
 #send get request to api
 # $1 has to set the api-function
 _ipv64_get() {
-  url="$IPv64_API?$1"
-  export _H1="Authorization: Bearer $IPv64_Token"
+  url="$WTS_API?$1"
+  export _H1="Authorization: Bearer $WTS_Token"
 
   _response=$(_get "$url")
   _response="$(echo "$_response" | _normalizeJson)"
@@ -138,8 +138,8 @@ _ipv64_get() {
 }
 
 _ipv64_rest() {
-  url="$IPv64_API"
-  export _H1="Authorization: Bearer $IPv64_Token"
+  url="$WTS_API"
+  export _H1="Authorization: Bearer $WTS_Token"
   export _H2="Content-Type: application/x-www-form-urlencoded"
   _response=$(_post "$2" "$url" "" "$1")
 
